@@ -6,6 +6,8 @@ import Login from "./routes/login";
 import Signup from "./routes/signup";
 import { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
+import { useEffect, useState } from "react";
+import Loader from "./components/loader";
 
 // ✅ SET Router
 const router = createBrowserRouter([
@@ -52,11 +54,27 @@ const GlobalStyles = createGlobalStyle`
 `;
 
 function App() {
+  // ✅ SET 파이어베이스 연결
+  const [fbLoading, setFbLoading] = useState(true);
+
+  const initFb = async () => {
+    // set Fb
+    setTimeout(() => setFbLoading(false), 2000);
+  };
+
+  useEffect(() => {
+    initFb();
+  }, []);
+
   return (
     <>
-      <GlobalStyles>
+      <GlobalStyles />
+
+      {fbLoading ? (
+        <Loader />
+      ) : (
         <RouterProvider router={router}></RouterProvider>
-      </GlobalStyles>
+      )}
     </>
   );
 }

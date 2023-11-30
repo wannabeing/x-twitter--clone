@@ -3,12 +3,13 @@ import Layout from "./components/layout";
 import Home from "./routes/home";
 import Profile from "./routes/profile";
 import Login from "./routes/login";
-import Signup from "./routes/signup";
-import { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
 import { useEffect, useState } from "react";
 import Loader from "./components/loader";
 import { auth } from "./firebase";
+import Logout from "./routes/logout";
+import Signup from "./routes/signup";
 
 // ✅ SET Router
 const router = createBrowserRouter([
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
     path: "/signup",
     element: <Signup />,
   },
+  {
+    path: "/logout",
+    element: <Logout />,
+  },
 ]);
 
 // ✅ SET Global Styles
@@ -54,12 +59,16 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
+const Wrapper = styled.div`
+  height: 100vh;
+`;
 function App() {
   // ✅ SET 파이어베이스 연결
   const [fbLoading, setFbLoading] = useState(true);
 
   const initFb = async () => {
     await auth.authStateReady();
+    setFbLoading(false);
   };
 
   useEffect(() => {
@@ -73,7 +82,9 @@ function App() {
       {fbLoading ? (
         <Loader />
       ) : (
-        <RouterProvider router={router}></RouterProvider>
+        <Wrapper>
+          <RouterProvider router={router}></RouterProvider>
+        </Wrapper>
       )}
     </>
   );

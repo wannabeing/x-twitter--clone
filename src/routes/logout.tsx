@@ -1,4 +1,10 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+
+interface IBtnType {
+  btntype: "account" | "social" | "login";
+}
 
 const Wrapper = styled.div`
   display: grid;
@@ -36,7 +42,6 @@ const ThirdTitle = styled.h3`
   font-weight: bold;
   padding-bottom: 20px;
 `;
-
 const BtnWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -44,17 +49,26 @@ const BtnWrapper = styled.div`
   width: min-content;
   padding-bottom: 50px;
 `;
-const Btn = styled.div`
+const Btn = styled(motion.div)<IBtnType>`
   display: flex;
   justify-content: center;
   align-items: center;
   width: 300px;
   padding: 10px;
-  background-color: white;
-  color: black;
+  background-color: ${(props) =>
+    props.btntype === "social"
+      ? "white"
+      : props.btntype === "account"
+      ? "#1c9bef"
+      : "black"};
+  color: ${(props) => (props.btntype === "social" ? "black" : "white")};
   font-weight: bold;
   border-radius: 15px;
+  border: ${(props) =>
+    props.btntype === "login" ? "2px solid rgba(255,255,255,0.3)" : "none"};
+  cursor: pointer;
 `;
+
 const BtnLine = styled.div`
   display: flex;
   justify-content: center;
@@ -72,7 +86,22 @@ const Line = styled.div`
 `;
 const LoginWrapper = styled.div``;
 
+const ModalSignup = styled(motion.div)`
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background-color: white;
+`;
+
 export default function Logout() {
+  // ✅ useHooks
+  const navigate = useNavigate();
+  const isModalVisible = useMatch("/signup");
+
+  // 🚀 회원가입 버튼 함수
+  const onCreateAccount = () => {
+    navigate("/signup");
+  };
   return (
     <>
       <Wrapper>
@@ -83,20 +112,29 @@ export default function Logout() {
           <Title>지금 일어나고 있는 일</Title>
           <SubTitle>지금 가입하세요.</SubTitle>
           <BtnWrapper>
-            <Btn>Google로 가입하기</Btn>
-            <Btn>Github로 가입하기</Btn>
+            <Btn btntype="social">Google로 가입하기</Btn>
+            <Btn btntype="social">Github로 가입하기</Btn>
             <BtnLine>
               <Line />
               <LineText>또는</LineText>
               <Line />
             </BtnLine>
-            <Btn>계정 만들기</Btn>
+            <Btn
+              layoutId="createAccount"
+              onClick={onCreateAccount}
+              btntype="account"
+            >
+              계정 만들기
+            </Btn>
           </BtnWrapper>
           <LoginWrapper>
             <ThirdTitle>이미 트위터에 가입하셨나요?</ThirdTitle>
-            <Btn>로그인</Btn>
+            <Btn btntype="login">로그인</Btn>
           </LoginWrapper>
         </Right>
+        <AnimatePresence>
+          {isModalVisible ? <ModalSignup layoutId="createAccount" /> : null}
+        </AnimatePresence>
       </Wrapper>
     </>
   );

@@ -1,9 +1,17 @@
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { AnimatePresence, motion } from "framer-motion";
+import { useForm } from "react-hook-form";
 import { useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { auth } from "../firebase";
 
 interface IBtnType {
   btntype: "account" | "social" | "login";
+}
+interface IForm {
+  email: string;
+  name: string;
+  pw: string;
 }
 
 const Wrapper = styled.div`
@@ -125,30 +133,80 @@ const ModalExitBtn = styled.div`
     }
   }
 `;
-const ModalFormWrapper = styled.div`
+const ModalWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
   padding: 10px 20px;
 `;
 const ModalTitle = styled.h1`
   font-weight: bold;
   font-size: 1.5em;
+  padding: 20px;
+`;
+const ModalForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+
+  height: 100%;
+  padding: 20px;
+`;
+const ModalInput = styled.input`
+  width: 80%;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #18191b;
+`;
+
+const ModalSubmit = styled.input`
+  width: 80%;
+  border-radius: 14px;
+  border: none;
+  padding: 20px;
+  background-color: white;
+  color: black;
+  font-weight: bold;
+`;
+const ModalError = styled.span`
+  font-size: 0.7em;
+  color: red;
 `;
 export default function Logout() {
   // ✅ useHooks
   const navigate = useNavigate();
   const isModalVisible = useMatch("/signup");
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    setFocus,
+  } = useForm<IForm>();
 
   // 🚀 회원가입 버튼 함수
   const onCreateAccount = () => {
     navigate("/signup");
+    setFocus("email");
   };
 
   // 🚀 모달창 나가기 함수
   const onClickExitModal = () => {
     navigate("/logout");
+  };
+
+  // 🚀 폼 제출 함수
+  const onSubmitForm = async (data: IForm) => {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      data.email,
+      data.pw
+    );
+
+    await updateProfile(userCredential.user, {
+      displayName: data.name,
+    });
   };
   return (
     <>
@@ -193,9 +251,42 @@ export default function Logout() {
                     </g>
                   </svg>
                 </ModalExitBtn>
-                <ModalFormWrapper>
-                  <ModalTitle>AAA</ModalTitle>
-                </ModalFormWrapper>
+                <ModalWrapper>
+                  <ModalTitle>AAAAAAAAA</ModalTitle>
+                  <ModalForm onSubmit={handleSubmit(onSubmitForm)}>
+                    <ModalInput
+                      {...register("email", {
+                        required: "ㅖㅖ를 입력해주세요.",
+                        pattern: {
+                          message: "올바른 이메일을 입력해주세요.",
+                          value:
+                            /[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]$/i,
+                        },
+                      })}
+                      placeholder="email"
+                    />
+                    <ModalError>{errors.email?.message}</ModalError>
+                    <ModalInput
+                      {...register("name", {
+                        required: "nn를 입력해주세요.",
+                        maxLength: 50,
+                      })}
+                      placeholder="sss"
+                    />
+                    <ModalError>{errors.name?.message}</ModalError>
+                    <ModalInput
+                      {...register("pw", {
+                        required: "pp를 입력해주세요.",
+                        maxLength: 50,
+                      })}
+                      placeholder="test"
+                      type="password"
+                    />
+                    <ModalError>{errors.pw?.message}</ModalError>
+
+                    <ModalSubmit type="submit" value="다음" />
+                  </ModalForm>
+                </ModalWrapper>
               </ModalSignup>
             </>
           ) : null}

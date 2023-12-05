@@ -86,13 +86,56 @@ const Line = styled.div`
 `;
 const LoginWrapper = styled.div``;
 
-const ModalSignup = styled(motion.div)`
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  background-color: white;
+const Overlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(91, 112, 131, 0.4);
+  opacity: 0;
 `;
 
+const ModalSignup = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 50px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: 60vw;
+  height: 80vh;
+  padding: 10px;
+  background-color: black;
+  border-radius: 15px;
+  opacity: 0;
+`;
+const ModalExitBtn = styled.div`
+  display: flex;
+  justify-content: flex-end;
+
+  svg {
+    width: 27px;
+    fill: white;
+    cursor: pointer;
+    border-radius: 50%;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+  }
+`;
+const ModalFormWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px;
+`;
+const ModalTitle = styled.h1`
+  font-weight: bold;
+  font-size: 1.5em;
+`;
 export default function Logout() {
   // ✅ useHooks
   const navigate = useNavigate();
@@ -102,6 +145,11 @@ export default function Logout() {
   const onCreateAccount = () => {
     navigate("/signup");
   };
+
+  // 🚀 모달창 나가기 함수
+  const onClickExitModal = () => {
+    navigate("/logout");
+  };
   return (
     <>
       <Wrapper>
@@ -109,31 +157,48 @@ export default function Logout() {
           <Logo />
         </Left>
         <Right>
-          <Title>지금 일어나고 있는 일</Title>
-          <SubTitle>지금 가입하세요.</SubTitle>
+          <Title>aaaa</Title>
+          <SubTitle>subsub</SubTitle>
           <BtnWrapper>
-            <Btn btntype="social">Google로 가입하기</Btn>
-            <Btn btntype="social">Github로 가입하기</Btn>
+            <Btn btntype="social">Google </Btn>
+            <Btn btntype="social">Github</Btn>
             <BtnLine>
               <Line />
-              <LineText>또는</LineText>
+              <LineText>or</LineText>
               <Line />
             </BtnLine>
-            <Btn
-              layoutId="createAccount"
-              onClick={onCreateAccount}
-              btntype="account"
-            >
-              계정 만들기
+            <Btn onClick={onCreateAccount} btntype="account">
+              create
             </Btn>
           </BtnWrapper>
           <LoginWrapper>
-            <ThirdTitle>이미 트위터에 가입하셨나요?</ThirdTitle>
-            <Btn btntype="login">로그인</Btn>
+            <ThirdTitle>?</ThirdTitle>
+            <Btn btntype="login">login</Btn>
           </LoginWrapper>
         </Right>
+        {/* 🔥 MODAL */}
         <AnimatePresence>
-          {isModalVisible ? <ModalSignup layoutId="createAccount" /> : null}
+          {isModalVisible ? (
+            <>
+              <Overlay
+                onClick={onClickExitModal}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              />
+              <ModalSignup animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <ModalExitBtn onClick={onClickExitModal}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <g>
+                      <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+                    </g>
+                  </svg>
+                </ModalExitBtn>
+                <ModalFormWrapper>
+                  <ModalTitle>AAA</ModalTitle>
+                </ModalFormWrapper>
+              </ModalSignup>
+            </>
+          ) : null}
         </AnimatePresence>
       </Wrapper>
     </>

@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import Loader from "./components/loader";
 import { auth } from "./firebase";
 import Logout from "./routes/logout";
-import Signup from "./routes/signup";
 
 // ✅ SET Router
 const router = createBrowserRouter([

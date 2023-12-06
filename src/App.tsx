@@ -68,7 +68,6 @@ const Wrapper = styled.div`
 function App() {
   // ✅ SET 파이어베이스 연결
   const [fbLoading, setFbLoading] = useState(true);
-
   const initFb = async () => {
     await auth.authStateReady();
     setFbLoading(false);

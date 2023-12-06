@@ -5,6 +5,7 @@ import styled from "styled-components";
 
 import SignupModal, { ISignupForm } from "../components/users/signup-modal";
 import LoginModal from "../components/users/login-modal";
+import GithubBtn from "../components/users/github-btn";
 
 interface IBtnType {
   btntype: "account" | "social" | "login";
@@ -57,6 +58,7 @@ const Btn = styled(motion.div)<IBtnType>`
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 5px;
   width: 300px;
   padding: 10px;
   background-color: ${(props) =>
@@ -66,7 +68,7 @@ const Btn = styled(motion.div)<IBtnType>`
       ? "#1c9bef"
       : "black"};
   color: ${(props) => (props.btntype === "social" ? "black" : "white")};
-  font-weight: bold;
+
   border-radius: 15px;
   border: ${(props) =>
     props.btntype === "login" ? "2px solid rgba(255,255,255,0.3)" : "none"};
@@ -116,8 +118,7 @@ export default function Logout() {
           <Title>aaaa</Title>
           <SubTitle>subsub</SubTitle>
           <BtnWrapper>
-            <Btn btntype="social">Google </Btn>
-            <Btn btntype="social">Github</Btn>
+            <GithubBtn />
             <BtnLine>
               <Line />
               <LineText>or</LineText>

@@ -25,6 +25,10 @@ const router = createBrowserRouter([
         path: "",
         element: <Home />,
       },
+      {
+        path: "logoutModal",
+        element: <Home />,
+      },
 
       {
         path: "profile",

@@ -42,7 +42,7 @@ export default function GithubBtn() {
   };
   return (
     <Btn onClick={onClick}>
-      <SocialLogo src="../public/github.svg" />
+      <SocialLogo src="../public/icons/github.svg" />
       <BtnText>Github로 가입하기</BtnText>{" "}
     </Btn>
   );

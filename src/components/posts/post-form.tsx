@@ -1,6 +1,9 @@
 import { useState } from "react";
 import styled from "styled-components";
 import Loader from "../loader";
+import { addDoc, collection, updateDoc } from "firebase/firestore";
+import { auth, fbDB, fbStorage } from "../../firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const Form = styled.form`
   display: flex;
@@ -88,7 +91,9 @@ export default function PostForm() {
   // 🚀 File Input 핸들 함수
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
-    if (files && files.length === 1) {
+    const maxSize = 1 * 1024 * 1024; // ✅ SET MAX_SIZE 1MB
+
+    if (files && files.length === 1 && files[0].size <= maxSize) {
       const file = files[0];
       setImageFile(file); // ✅ SET IMGFILE VALUE
 
@@ -99,14 +104,63 @@ export default function PostForm() {
         setPreview(result); // ✅ SET PREVIEW VALUE
       };
     }
+
+    // ✅ 파일용량 초과시
+    if (files && files[0].size >= maxSize) {
+      console.log("❌ 1MB 이하의 파일을 업로드해주세요.");
+    }
+  };
+
+  // 🚀 Form 핸들 함수
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const user = auth.currentUser;
+    e.preventDefault();
+    if (!user || isLoading || textareaVal === "" || textareaVal.length > 180)
+      return;
+
+    try {
+      // ✅ SET LOADING
+      setIsLoading(true);
+
+      // ✅ UPLOAD TWEET
+      const tweet = await addDoc(collection(fbDB, "tweets"), {
+        text: textareaVal,
+        imgUrl: "",
+        uid: user.uid,
+        username: user.displayName || "???",
+        createdAt: Date.now(),
+      });
+
+      if (imgFile) {
+        // ✅ UPLOAD IMG
+        const imgRef = ref(fbStorage, `tweets/uid-${user.uid}/tid-${tweet.id}`);
+        const uploadResult = await uploadBytes(imgRef, imgFile);
+
+        // ✅ UPDATE TWEET IMGURL
+        const imgUrl = await getDownloadURL(uploadResult.ref);
+        await updateDoc(tweet, {
+          imgUrl,
+        });
+      }
+    } catch (error) {
+      console.log("❌ POST FORM ERROR: ", error);
+    } finally {
+      // ✅ RESET LOADING & VALUE
+      setTextareaVal("");
+      setImageFile(null);
+
+      setIsLoading(false);
+    }
   };
   return (
-    <Form>
+    <Form onSubmit={handleSubmit}>
       <TextArea
         id="textarea"
         onChange={handleTextArea}
         placeholder="What is happening?!"
         value={textareaVal}
+        maxLength={180}
+        required
       />
       <ImgLabel htmlFor="file">
         <ImgImg>

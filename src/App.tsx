@@ -1,4 +1,4 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import Layout from "./components/layout";
 import Home from "./routes/home";
 import Profile from "./routes/profile";
@@ -8,16 +8,17 @@ import { useEffect, useState } from "react";
 import Loader from "./components/loader";
 import { auth } from "./firebase";
 import Logout from "./routes/logout";
-import ProtectedRoute from "./components/protected-route";
+import LoginProtectedRoute from "./components/login-protected-route";
+import LogoutProtectedRoute from "./components/logout-protected-route";
 
 // ✅ SET Router
 const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <ProtectedRoute>
+      <LoginProtectedRoute>
         <Layout />
-      </ProtectedRoute>
+      </LoginProtectedRoute>
     ),
 
     children: [
@@ -38,16 +39,26 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/login",
-    element: <Logout />,
-  },
-  {
-    path: "/signup",
-    element: <Logout />,
-  },
-  {
-    path: "/logout",
-    element: <Logout />,
+    path: "/",
+    element: (
+      <LogoutProtectedRoute>
+        <Outlet />
+      </LogoutProtectedRoute>
+    ),
+    children: [
+      {
+        path: "/login",
+        element: <Logout />,
+      },
+      {
+        path: "/signup",
+        element: <Logout />,
+      },
+      {
+        path: "/logout",
+        element: <Logout />,
+      },
+    ],
   },
 ]);
 

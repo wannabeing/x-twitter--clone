@@ -7,10 +7,10 @@ const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 4fr;
   gap: 10px;
-  padding: 50px;
   width: 100%;
   max-width: 860px;
   height: 100%;
+  margin: 0 auto;
 `;
 
 const Menu = styled.div`
@@ -18,6 +18,7 @@ const Menu = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  padding: 30px 0;
 `;
 const MenuItem = styled.div`
   display: flex;

@@ -8,13 +8,13 @@ const Overlay = styled(motion.div)`
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(91, 112, 131);
+  background-color: #242d35;
   opacity: 0;
 `;
 
 const ModalLogout = styled(motion.div)`
   position: fixed;
-  top: 50px;
+  top: 200px;
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -39,7 +39,23 @@ const ModalWrapper = styled.div`
 const ModalTitle = styled.h1`
   font-weight: bold;
   font-size: 1.5em;
-  padding: 20px;
+  padding: 20px 0;
+`;
+const ModalText = styled.span`
+  opacity: 0.5;
+  margin-bottom: 20px;
+`;
+
+const Btn = styled.button<{ type?: string }>`
+  border-radius: 15px;
+  padding: 15px;
+  margin: 10px;
+  border: none;
+  outline: ${(props) => (props.type === "logout" ? "none" : "2px solid gray")};
+  font-weight: bold;
+  background-color: ${(props) => (props.type === "logout" ? "white" : "black")};
+  color: ${(props) => (props.type === "logout" ? "black" : "white")};
+  cursor: pointer;
 `;
 
 export default function LogoutModal() {
@@ -52,8 +68,8 @@ export default function LogoutModal() {
     navigate("/");
   };
 
-  const onLogout = () => {
-    auth.signOut();
+  const onLogout = async () => {
+    await auth.signOut();
     navigate("/logout");
   };
 
@@ -72,10 +88,15 @@ export default function LogoutModal() {
           />
           <ModalLogout animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <ModalWrapper>
-              <ModalTitle>AAAAAAAAA</ModalTitle>
-              <span>test</span>
-              <button onClick={onLogout}>로그아웃</button>
-              <button onClick={onCancel}>취소</button>
+              <ModalTitle>out of X ?</ModalTitle>
+              <ModalText>
+                You can always log back in at any time. If you just want to
+                switch accounts, you can do that by adding an existing account.
+              </ModalText>
+              <Btn type="logout" onClick={onLogout}>
+                로그아웃
+              </Btn>
+              <Btn onClick={onCancel}>취소</Btn>
             </ModalWrapper>
           </ModalLogout>
         </>

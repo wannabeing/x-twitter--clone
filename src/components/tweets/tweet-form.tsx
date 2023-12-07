@@ -9,6 +9,7 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   margin: 40px;
+  margin-bottom: 0px;
 `;
 const TextArea = styled.textarea`
   background-color: transparent;
@@ -69,7 +70,7 @@ const LoaderWrapper = styled.div`
   background: rgba(0, 0, 0, 0.7);
 `;
 
-export default function PostForm() {
+export default function TweetForm() {
   // ✅ useHooks
   const [textareaVal, setTextareaVal] = useState("");
   const [isLoading, setIsLoading] = useState(false);

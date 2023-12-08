@@ -38,6 +38,7 @@ const ImgImg = styled.div`
   width: 25px;
   color: #1c9bef;
 `;
+
 const UploadBtn = styled.button`
   align-self: flex-end;
   width: 100%;
@@ -51,6 +52,7 @@ const UploadBtn = styled.button`
 `;
 
 const PreviewWrapper = styled.div`
+  position: relative;
   width: fit-content;
   background-color: rgba(255, 255, 255, 0.2);
   padding: 10px;
@@ -58,6 +60,23 @@ const PreviewWrapper = styled.div`
 `;
 const PreviewImg = styled.img`
   max-width: 250px;
+`;
+const PreviewImgDelete = styled.div`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+  background-color: black;
+  border-radius: 50%;
+  padding: 5px;
+  svg {
+    fill: white;
+    width: 15px;
+  }
+
+  &:hover {
+    background-color: tomato;
+  }
 `;
 
 const LoaderWrapper = styled.div`
@@ -144,7 +163,7 @@ export default function TweetForm() {
         });
       }
     } catch (error) {
-      console.log("❌ POST FORM ERROR: ", error);
+      console.log("❌ TWEET FORM ERROR: ", error);
     } finally {
       // ✅ RESET LOADING & VALUE
       setTextareaVal("");
@@ -153,6 +172,13 @@ export default function TweetForm() {
       setIsLoading(false);
     }
   };
+
+  // 🚀 업로드이미지 삭제 함수
+  const onPreviewExit = () => {
+    setImageFile(null);
+    setPreview("");
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
       <TextArea
@@ -186,6 +212,17 @@ export default function TweetForm() {
       {imgFile && (
         <PreviewWrapper>
           <PreviewImg src={preview} />
+          <PreviewImgDelete onClick={onPreviewExit}>
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-1hjwoze r-12ym1je"
+            >
+              <g>
+                <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
+              </g>
+            </svg>
+          </PreviewImgDelete>
         </PreviewWrapper>
       )}
 

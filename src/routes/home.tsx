@@ -4,7 +4,7 @@ import TweetTimeLine from "../components/tweets/tweet-timeline";
 
 const Wrapper = styled.div`
   display: grid;
-  grid-template-rows: 1fr 5fr;
+  grid-template-rows: 0.3fr 0.7fr;
   gap: 20px;
 
   border: 1px solid rgba(255, 255, 255, 0.2);

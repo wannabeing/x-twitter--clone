@@ -5,9 +5,8 @@ import TweetTimeLine from "../components/tweets/tweet-timeline";
 const Wrapper = styled.div`
   display: grid;
   grid-template-rows: 1fr 5fr;
-  gap: 40px;
+  gap: 20px;
 
-  overflow-y: scroll;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-top: none;
   border-bottom: none;

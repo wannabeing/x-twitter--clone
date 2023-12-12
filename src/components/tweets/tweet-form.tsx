@@ -168,8 +168,10 @@ export default function TweetForm() {
       // ✅ RESET LOADING & VALUE
       setTextareaVal("");
       setImageFile(null);
-
       setIsLoading(false);
+
+      const textarea = document.getElementById("textarea");
+      textarea ? (textarea.style.height = "auto") : null;
     }
   };
 

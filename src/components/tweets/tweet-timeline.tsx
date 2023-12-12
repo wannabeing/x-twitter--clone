@@ -45,17 +45,27 @@ const Tweet = styled.div`
     border-bottom: none;
   }
 `;
-const ProfileWrapper = styled.div`
+
+const ProfileWrapper = styled.label`
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-`;
-const ProfileImg = styled.div`
+  align-items: center;
+
   width: 40px;
   height: 40px;
   border-radius: 50%;
+  overflow: hidden;
   background-color: rgba(255, 255, 255, 0.2);
+  .anony {
+    width: 20px;
+  }
 `;
+const ProfileImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -238,7 +248,29 @@ export default function TweetTimeLine() {
         tweets.map((tweet) => (
           <Tweet key={tweet.id}>
             <ProfileWrapper>
-              <ProfileImg />
+              <ProfileWrapper>
+                {/* 🔥 프사 존재여부에 따라서 다름 */}
+                {currentUser?.photoURL ? (
+                  <>
+                    <ProfileImg src={currentUser.photoURL} />
+                  </>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="anony w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                    />
+                  </svg>
+                )}
+              </ProfileWrapper>
             </ProfileWrapper>
             <ContentWrapper>
               <UserWrapper>

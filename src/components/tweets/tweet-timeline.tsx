@@ -22,7 +22,7 @@ export interface ITweet {
   createdAt: number;
 }
 
-interface ITweetFnArgs {
+export interface ITweetFnArgs {
   tweetID: string;
   imgUrl: string;
 }

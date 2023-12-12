@@ -1,15 +1,33 @@
 import styled from "styled-components";
-import { auth, fbStorage } from "../firebase";
-import { useState } from "react";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { auth, fbDB, fbStorage } from "../firebase";
+import { useEffect, useState } from "react";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { ITweet, ITweetFnArgs } from "../components/tweets/tweet-timeline";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import Loader from "../components/loader";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  padding: 10px 20px;
 `;
 const Header = styled.div`
   display: flex;
@@ -50,8 +68,6 @@ const Contents = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-
-  padding: 0 20px;
   gap: 20px;
 `;
 const ContentTop = styled.div`
@@ -81,6 +97,10 @@ const AvatarWrapper = styled.label`
     position: absolute;
     top: 50%;
     left: 40%;
+    fill: white;
+    padding: 5px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.8);
   }
 
   &:hover {
@@ -124,9 +144,113 @@ const HowmanyFollows = styled.span`
 const FollowText = styled.span`
   opacity: 0.8;
 `;
-
 const AvatarInput = styled.input`
   display: none;
+`;
+
+const Tweets = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-top: 1px solid white;
+  width: 100%;
+  height: 100%;
+`;
+const Tweet = styled.div`
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  min-height: 70px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const Text = styled.span``;
+const ImgWrapper = styled.div`
+  margin-bottom: 10px;
+`;
+const TweetImg = styled.img`
+  width: 100%;
+  height: auto;
+  max-width: 500px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+`;
+
+const MyBtnWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+`;
+const MyBtn = styled.div<{ type?: string }>`
+  color: ${(props) => (props.type === "del" ? "tomato" : "white")};
+  width: 20px;
+  cursor: pointer;
+`;
+
+const TweetDelOverlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #242d35;
+  opacity: 0;
+`;
+const TweetDelModal = styled(motion.div)`
+  position: fixed;
+  top: 200px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  height: 350px;
+  padding: 10px;
+  background-color: black;
+  border-radius: 15px;
+  opacity: 0;
+`;
+
+const ModalWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100%;
+  padding: 10px 20px;
+`;
+const ModalTitle = styled.h1`
+  font-weight: bold;
+  font-size: 1.5em;
+  padding: 20px 0;
+`;
+const ModalText = styled.span`
+  opacity: 0.5;
+  margin-bottom: 20px;
+`;
+
+const ModalBtn = styled.button<{ type?: string }>`
+  border-radius: 15px;
+  padding: 15px;
+  margin: 10px;
+  border: none;
+  outline: ${(props) => (props.type === "delete" ? "none" : "2px solid gray")};
+  font-weight: bold;
+  background-color: ${(props) =>
+    props.type === "delete" ? "#f4222d" : "black"};
+  color: white;
+  cursor: pointer;
 `;
 
 export default function Profile() {
@@ -135,7 +259,84 @@ export default function Profile() {
 
   // ✅ useHooks
   const [avatar, setAvatar] = useState(user?.photoURL);
+  const [tweets, setTweets] = useState<ITweet[]>([]);
+  const [isFetch, setIsFetch] = useState(false);
+  const [isClickDel, setIsClickDel] = useState(false);
+  const [delTweetID, setDelTweetID] = useState("");
+  const [delTweetImg, setDelTweetImg] = useState("");
   const navigate = useNavigate();
+
+  // 🚀 DB에서 데이터 가져오는 함수
+  useEffect(() => {
+    // ✅ SET LOADING
+    setIsFetch(true);
+
+    // ✅ CREATE QUERY
+    const myTweetQuery = query(
+      collection(fbDB, "tweets"),
+      where("uid", "==", user?.uid), // 로그인한 유저의 트윗만 가져오기
+      orderBy("createdAt", "desc") // 생성 순으로 내림차순
+    );
+
+    // ✅ FETCH QUERY [REALTIME] onSnapshot
+    const unsubscribe = onSnapshot(myTweetQuery, (snapshot) => {
+      const result = snapshot.docs.map((doc) => {
+        const { text, uid, username, imgUrl, createdAt } = doc.data();
+        return {
+          id: doc.id,
+          text,
+          uid,
+          username,
+          imgUrl,
+          createdAt,
+        };
+      });
+      // ✅ SET TWEETS
+      setTweets(result);
+      // ✅ RESET LOADING
+      setIsFetch(false);
+    });
+
+    // ✅ onSnapshot UNMOUNT
+    return () => {
+      unsubscribe();
+    };
+  }, [user]);
+
+  // 🚀 트윗 삭제 버튼 클릭 함수
+  const onClickDelBtn = (args: ITweetFnArgs) => {
+    setIsClickDel(true);
+    setDelTweetID(args.tweetID);
+    args.imgUrl === "" ? null : setDelTweetImg(args.imgUrl);
+  };
+
+  // 🚀 트윗 삭제하는 함수
+  const onDelete = async (args: ITweetFnArgs) => {
+    if (!user) return;
+
+    try {
+      // ✅ SET LOADING
+      setIsClickDel(true);
+
+      // ✅ DB에서 트윗 삭제
+      await deleteDoc(doc(fbDB, "tweets", args.tweetID));
+
+      // ✅ [IF] 업로드 이미지가 존재한다면
+      if (args.imgUrl !== "") {
+        const currentImgRef = ref(
+          fbStorage,
+          `tweets/uid-${user.uid}/tid-${args.tweetID}`
+        );
+        // ✅ Storage에서 업로드이미지 삭제
+        await deleteObject(currentImgRef);
+      }
+    } catch (error) {
+      console.log("❌ TWEET DELETE ERROR: ", error);
+    } finally {
+      // ✅ RESET LOADING
+      setIsClickDel(false);
+    }
+  };
 
   // 🚀 프로필이미지 업로드 함수
   const onImgChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -262,6 +463,113 @@ export default function Profile() {
           </FollowWrapper>
         </ContentMyInfo>
       </Contents>
+
+      {!isFetch && tweets ? (
+        <Tweets>
+          {tweets.map((tweet) => (
+            <Tweet key={tweet.id}>
+              <ContentWrapper>
+                <Text>{tweet.text}</Text>
+                {/* 🔥 이미지를 업로드 했으면 이미지가 보임 */}
+                {tweet.imgUrl ? (
+                  <ImgWrapper>
+                    <TweetImg src={tweet.imgUrl} />
+                  </ImgWrapper>
+                ) : (
+                  ""
+                )}
+                <MyBtnWrapper>
+                  {/* 🔥 로그인유저와 작성유저가 같으면 수정 & 삭제버튼 보임 */}
+                  {user && user?.uid === tweet.uid ? (
+                    <>
+                      <MyBtn type="edit" onClick={() => {}}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                          />
+                        </svg>
+                      </MyBtn>
+                      <MyBtn
+                        type="del"
+                        onClick={() => {
+                          onClickDelBtn({
+                            tweetID: tweet.id,
+                            imgUrl: tweet.imgUrl,
+                          });
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.5}
+                          stroke="currentColor"
+                          className="w-6 h-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+                          />
+                        </svg>
+                      </MyBtn>
+                      {/* 🔥 삭제버튼 클릭 시, 모달창 띄움 */}
+                      <AnimatePresence>
+                        {isClickDel ? (
+                          <TweetDelOverlay
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            <TweetDelModal
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                            >
+                              <ModalWrapper>
+                                <ModalTitle>Delete post?</ModalTitle>
+                                <ModalText>
+                                  This can’t be undone and it will be removed
+                                  from your profile, the timeline of any
+                                  accounts that follow you, and from search
+                                  results.
+                                </ModalText>
+                                <ModalBtn
+                                  type="delete"
+                                  onClick={() =>
+                                    onDelete({
+                                      tweetID: delTweetID,
+                                      imgUrl: delTweetImg,
+                                    })
+                                  }
+                                >
+                                  삭제
+                                </ModalBtn>
+                                <ModalBtn onClick={() => setIsClickDel(false)}>
+                                  취소
+                                </ModalBtn>
+                              </ModalWrapper>
+                            </TweetDelModal>
+                          </TweetDelOverlay>
+                        ) : null}
+                      </AnimatePresence>
+                    </>
+                  ) : null}
+                </MyBtnWrapper>
+              </ContentWrapper>
+            </Tweet>
+          ))}
+        </Tweets>
+      ) : (
+        <Loader />
+      )}
     </Wrapper>
   );
 }

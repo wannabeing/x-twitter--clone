@@ -2,6 +2,7 @@ import { GithubAuthProvider, signInWithPopup } from "firebase/auth";
 import styled from "styled-components";
 import { auth } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import GithubIcon from "/public/icons/github.svg";
 
 const Btn = styled.div`
   display: flex;
@@ -42,7 +43,7 @@ export default function GithubBtn() {
   };
   return (
     <Btn onClick={onClick}>
-      <SocialLogo src="/icons/github.svg" />
+      <SocialLogo src={GithubIcon} />
       <BtnText>Github로 가입하기</BtnText>{" "}
     </Btn>
   );

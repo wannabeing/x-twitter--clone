@@ -45,16 +45,16 @@ const ModalText = styled.span`
   margin-bottom: 20px;
 `;
 
-const ModalBtn = styled.button<{ btnType?: MODAL_BTN_TYPE }>`
+const ModalBtn = styled.button<{ $btnType?: MODAL_BTN_TYPE }>`
   border-radius: 15px;
   padding: 15px;
   margin: 10px;
   border: none;
   outline: ${(props) =>
-    props.btnType === "delete" ? "none" : "2px solid gray"};
+    props.$btnType === "delete" ? "none" : "2px solid gray"};
   font-weight: bold;
   background-color: ${(props) =>
-    props.btnType === "delete" ? "#f4222d" : "black"};
+    props.$btnType === "delete" ? "#f4222d" : "black"};
   color: white;
   cursor: pointer;
 `;
@@ -73,7 +73,7 @@ export default function Modal({
         <ModalInner>
           <ModalTitle>{title}</ModalTitle>
           <ModalText>{text}</ModalText>
-          <ModalBtn btnType={btnType} onClick={() => execFunction()}>
+          <ModalBtn $btnType={btnType} onClick={() => execFunction()}>
             {btnText}
           </ModalBtn>
           <ModalBtn

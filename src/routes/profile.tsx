@@ -22,10 +22,16 @@ import Loader from "../components/loader";
 import { AnimatePresence } from "framer-motion";
 import { I_MODAL_PROPS, I_TWEET, I_TWEET_BTN_ARGS } from "../type-config";
 import Modal from "../components/modal";
+import GoBackSvg from "/public/icons/goback.svg";
+import CameraPlusSvg from "/public/icons/camera-plus.svg";
+import EditSvg from "/public/icons/edit.svg";
+import DelSvg from "/public/icons/delete.svg";
+import UserPlusSvg from "/public/icons/user-plus.svg";
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
+
   align-items: center;
   gap: 20px;
   padding: 10px 20px;
@@ -48,10 +54,6 @@ const GoBack = styled.div`
   padding: 10px;
   cursor: pointer;
   border-radius: 50%;
-
-  svg {
-    color: #abaeaf;
-  }
 `;
 const HeaderTitle = styled.div`
   display: flex;
@@ -89,21 +91,6 @@ const AvatarWrapper = styled.label`
   overflow: hidden;
   cursor: pointer;
 
-  .anony {
-    width: 30px;
-  }
-  .plusIcon {
-    opacity: 0.7;
-    width: 30px;
-    position: absolute;
-    top: 50%;
-    left: 40%;
-    fill: white;
-    padding: 5px;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.8);
-  }
-
   &:hover {
     opacity: 0.8;
   }
@@ -118,6 +105,7 @@ const EditBtn = styled.div`
   padding: 10px;
   border-radius: 20px;
   font-weight: 500;
+  font-size: 0.8em;
 `;
 const ContentMyInfo = styled.div`
   display: flex;
@@ -182,7 +170,7 @@ const ImgWrapper = styled.div`
 const TweetImg = styled.img`
   width: 100%;
   height: auto;
-  max-width: 500px;
+  max-width: 700px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
 `;
@@ -196,6 +184,22 @@ const MyBtn = styled.div<{ type?: string }>`
   color: ${(props) => (props.type === "del" ? "tomato" : "white")};
   width: 20px;
   cursor: pointer;
+`;
+
+const IconImg = styled.img`
+  &.plus {
+    position: absolute;
+    opacity: 0.7;
+    width: 30px;
+    top: 50%;
+    left: 40%;
+    padding: 5px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  &.anony {
+    width: 50px;
+  }
 `;
 
 export default function Profile() {
@@ -338,20 +342,7 @@ export default function Profile() {
     <Wrapper>
       <Header>
         <GoBack onClick={onGoback}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-            />
-          </svg>
+          <IconImg src={GoBackSvg} />
         </GoBack>
         <HeaderTitle>
           <DisplayName>{user?.displayName}</DisplayName>
@@ -366,31 +357,10 @@ export default function Profile() {
             {avatar ? (
               <>
                 <AvatarImg src={avatar} />
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  className="plusIcon r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-18yzcnr r-yc9v9c"
-                >
-                  <g>
-                    <path d="M9.697 3H11v2h-.697l-3 2H5c-.276 0-.5.224-.5.5v11c0 .276.224.5.5.5h14c.276 0 .5-.224.5-.5V10h2v8.5c0 1.381-1.119 2.5-2.5 2.5H5c-1.381 0-2.5-1.119-2.5-2.5v-11C2.5 6.119 3.619 5 5 5h1.697l3-2zM12 10.5c-1.105 0-2 .895-2 2s.895 2 2 2 2-.895 2-2-.895-2-2-2zm-4 2c0-2.209 1.791-4 4-4s4 1.791 4 4-1.791 4-4 4-4-1.791-4-4zM17 2c0 1.657-1.343 3-3 3v1c1.657 0 3 1.343 3 3h1c0-1.657 1.343-3 3-3V5c-1.657 0-3-1.343-3-3h-1z"></path>
-                  </g>
-                </svg>
+                <IconImg className="plus" src={CameraPlusSvg} />
               </>
             ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="anony w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
-                />
-              </svg>
+              <IconImg className="anony" src={UserPlusSvg} />
             )}
           </AvatarWrapper>
           <AvatarInput
@@ -438,20 +408,7 @@ export default function Profile() {
                   {user && user?.uid === tweet.uid ? (
                     <>
                       <MyBtn type="edit" onClick={() => {}}>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                          />
-                        </svg>
+                        <IconImg src={EditSvg} />
                       </MyBtn>
                       <MyBtn
                         type="del"
@@ -462,20 +419,7 @@ export default function Profile() {
                           });
                         }}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={1.5}
-                          stroke="currentColor"
-                          className="w-6 h-6"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                          />
-                        </svg>
+                        <IconImg src={DelSvg} />
                       </MyBtn>
                       {/* 🔥 삭제버튼 클릭 시, 모달창 띄움 */}
                       <AnimatePresence>

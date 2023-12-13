@@ -7,6 +7,7 @@ import { FirebaseError } from "firebase/app";
 import Loader from "../loader";
 import { auth } from "../../firebase";
 import { useForm } from "react-hook-form";
+import CloseSvg from "/public/icons/close.svg";
 
 export interface ISignupForm {
   email: string;
@@ -114,6 +115,15 @@ const ModalLoaderWrapper = styled.div`
   margin: 0 auto;
 `;
 
+const CloseIcon = styled.img`
+  width: 30px;
+  cursor: pointer;
+  border-radius: 50%;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+`;
 export default function SignupModal() {
   // ✅ useHooks
   const navigate = useNavigate();
@@ -179,11 +189,7 @@ export default function SignupModal() {
           />
           <ModalSignup animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             <ModalExitBtn onClick={onClickExitModal}>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <g>
-                  <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
-                </g>
-              </svg>
+              <CloseIcon src={CloseSvg} />
             </ModalExitBtn>
             <ModalWrapper>
               <ModalTitle>AAAAAAAAA</ModalTitle>

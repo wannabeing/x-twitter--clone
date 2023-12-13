@@ -4,6 +4,8 @@ import Loader from "../loader";
 import { addDoc, collection, updateDoc } from "firebase/firestore";
 import { auth, fbDB, fbStorage } from "../../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import ImgSvg from "/public/icons/image.svg";
+import CloseSvg from "/public/icons/close.svg";
 
 const Form = styled.form`
   display: flex;
@@ -29,14 +31,16 @@ const TextArea = styled.textarea`
 const ImgLabel = styled.label`
   cursor: pointer;
   width: min-content;
+  height: auto;
   margin: 10px 0;
+`;
+const ImgIcon = styled.img`
+  width: 20px;
+  filter: invert(49%) sepia(68%) saturate(2512%) hue-rotate(178deg)
+    brightness(98%) contrast(90%);
 `;
 const ImgInput = styled.input`
   display: none;
-`;
-const ImgImg = styled.div`
-  width: 25px;
-  color: #1c9bef;
 `;
 
 const UploadBtn = styled.button`
@@ -69,6 +73,7 @@ const PreviewImgDelete = styled.div`
   background-color: black;
   border-radius: 50%;
   padding: 5px;
+
   svg {
     fill: white;
     width: 15px;
@@ -77,6 +82,10 @@ const PreviewImgDelete = styled.div`
   &:hover {
     background-color: tomato;
   }
+`;
+
+const PreviewImgIcon = styled.img`
+  width: 15px;
 `;
 
 const LoaderWrapper = styled.div`
@@ -190,22 +199,7 @@ export default function TweetForm() {
         required
       />
       <ImgLabel htmlFor="file">
-        <ImgImg>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-            />
-          </svg>
-        </ImgImg>
+        <ImgIcon src={ImgSvg} />
       </ImgLabel>
       <ImgInput id="file" onChange={handleInput} type="file" accept="image/*" />
       {/* 🔥 PREVIEW */}
@@ -213,15 +207,7 @@ export default function TweetForm() {
         <PreviewWrapper>
           <PreviewImg src={preview} />
           <PreviewImgDelete onClick={onPreviewExit}>
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              className="r-4qtqp9 r-yyyyoo r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-1hjwoze r-12ym1je"
-            >
-              <g>
-                <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"></path>
-              </g>
-            </svg>
+            <PreviewImgIcon src={CloseSvg} />
           </PreviewImgDelete>
         </PreviewWrapper>
       )}

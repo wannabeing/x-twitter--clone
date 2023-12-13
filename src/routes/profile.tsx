@@ -9,7 +9,6 @@ import {
 } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { ITweet, ITweetFnArgs } from "../components/tweets/tweet-timeline";
 import {
   collection,
   deleteDoc,
@@ -20,7 +19,9 @@ import {
   where,
 } from "firebase/firestore";
 import Loader from "../components/loader";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
+import { I_MODAL_PROPS, I_TWEET, I_TWEET_BTN_ARGS } from "../type-config";
+import Modal from "../components/modal";
 
 const Wrapper = styled.div`
   display: flex;
@@ -197,73 +198,16 @@ const MyBtn = styled.div<{ type?: string }>`
   cursor: pointer;
 `;
 
-const TweetDelOverlay = styled(motion.div)`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #242d35;
-  opacity: 0;
-`;
-const TweetDelModal = styled(motion.div)`
-  position: fixed;
-  top: 200px;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-  height: 350px;
-  padding: 10px;
-  background-color: black;
-  border-radius: 15px;
-  opacity: 0;
-`;
-
-const ModalWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  height: 100%;
-  padding: 10px 20px;
-`;
-const ModalTitle = styled.h1`
-  font-weight: bold;
-  font-size: 1.5em;
-  padding: 20px 0;
-`;
-const ModalText = styled.span`
-  opacity: 0.5;
-  margin-bottom: 20px;
-`;
-
-const ModalBtn = styled.button<{ type?: string }>`
-  border-radius: 15px;
-  padding: 15px;
-  margin: 10px;
-  border: none;
-  outline: ${(props) => (props.type === "delete" ? "none" : "2px solid gray")};
-  font-weight: bold;
-  background-color: ${(props) =>
-    props.type === "delete" ? "#f4222d" : "black"};
-  color: white;
-  cursor: pointer;
-`;
-
 export default function Profile() {
   // ✅ currentUser
   const { currentUser: user } = auth;
 
   // ✅ useHooks
   const [avatar, setAvatar] = useState(user?.photoURL);
-  const [tweets, setTweets] = useState<ITweet[]>([]);
+  const [tweets, setTweets] = useState<I_TWEET[]>([]);
   const [isFetch, setIsFetch] = useState(false);
   const [isClickDel, setIsClickDel] = useState(false);
-  const [delTweetID, setDelTweetID] = useState("");
-  const [delTweetImg, setDelTweetImg] = useState("");
+  const [modalProps, setModalProps] = useState<I_MODAL_PROPS | null>(null);
   const navigate = useNavigate();
 
   // 🚀 DB에서 데이터 가져오는 함수
@@ -304,14 +248,25 @@ export default function Profile() {
   }, [user]);
 
   // 🚀 트윗 삭제 버튼 클릭 함수
-  const onClickDelBtn = (args: ITweetFnArgs) => {
+  const onClickDelBtn = (args: I_TWEET_BTN_ARGS) => {
     setIsClickDel(true);
-    setDelTweetID(args.tweetID);
-    args.imgUrl === "" ? null : setDelTweetImg(args.imgUrl);
+
+    // ✅ 모달에 전달할 Props 설정
+    setModalProps({
+      title: "Delete post?",
+      text: `This can’t be undone and it will be removed from your profile, 
+        the timeline of any accounts that follow you, and from search
+        results.`,
+      btnText: "삭제",
+      btnType: "delete",
+      setCancelState: setIsClickDel,
+      execFunction: () =>
+        onDelete({ tweetID: args.tweetID, imgUrl: args.imgUrl }),
+    });
   };
 
   // 🚀 트윗 삭제하는 함수
-  const onDelete = async (args: ITweetFnArgs) => {
+  const onDelete = async (args: I_TWEET_BTN_ARGS) => {
     if (!user) return;
 
     try {
@@ -524,40 +479,8 @@ export default function Profile() {
                       </MyBtn>
                       {/* 🔥 삭제버튼 클릭 시, 모달창 띄움 */}
                       <AnimatePresence>
-                        {isClickDel ? (
-                          <TweetDelOverlay
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                          >
-                            <TweetDelModal
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                            >
-                              <ModalWrapper>
-                                <ModalTitle>Delete post?</ModalTitle>
-                                <ModalText>
-                                  This can’t be undone and it will be removed
-                                  from your profile, the timeline of any
-                                  accounts that follow you, and from search
-                                  results.
-                                </ModalText>
-                                <ModalBtn
-                                  type="delete"
-                                  onClick={() =>
-                                    onDelete({
-                                      tweetID: delTweetID,
-                                      imgUrl: delTweetImg,
-                                    })
-                                  }
-                                >
-                                  삭제
-                                </ModalBtn>
-                                <ModalBtn onClick={() => setIsClickDel(false)}>
-                                  취소
-                                </ModalBtn>
-                              </ModalWrapper>
-                            </TweetDelModal>
-                          </TweetDelOverlay>
+                        {isClickDel && modalProps ? (
+                          <Modal {...modalProps} />
                         ) : null}
                       </AnimatePresence>
                     </>

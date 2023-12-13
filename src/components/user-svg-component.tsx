@@ -8,7 +8,7 @@ export default function UserSvgComponent({ colorProp }: IProps) {
       fill="none"
       color={colorProp}
       viewBox="0 0 24 24"
-      stroke-width="2"
+      strokeWidth="2"
       stroke="currentColor"
       className="anony w-6 h-6"
     >

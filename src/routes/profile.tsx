@@ -21,12 +21,12 @@ import {
 import Loader from "../components/loader";
 import { AnimatePresence } from "framer-motion";
 import { I_MODAL_PROPS, I_TWEET, I_TWEET_BTN_ARGS } from "../type-config";
-import Modal from "../components/modal";
 import GoBackSvg from "/public/icons/goback.svg";
 import CameraPlusSvg from "/public/icons/camera-plus.svg";
 import EditSvg from "/public/icons/edit.svg";
 import DelSvg from "/public/icons/delete.svg";
 import UserPlusSvg from "/public/icons/user-plus.svg";
+import Modal from "../components/modal";
 
 const Wrapper = styled.div`
   display: flex;

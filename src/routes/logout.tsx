@@ -61,6 +61,7 @@ const Btn = styled(motion.div)<IBtnType>`
   gap: 5px;
   width: 300px;
   padding: 10px;
+  font-weight: 500;
   background-color: ${(props) =>
     props.btntype === "social"
       ? "white"
@@ -125,13 +126,13 @@ export default function Logout() {
               <Line />
             </BtnLine>
             <Btn onClick={onCreateAccount} btntype="account">
-              create
+              계정 만들기
             </Btn>
           </BtnWrapper>
           <LoginWrapper>
             <ThirdTitle>?</ThirdTitle>
             <Btn onClick={onLogin} btntype="login">
-              login
+              로그인
             </Btn>
           </LoginWrapper>
         </Right>

@@ -9,7 +9,7 @@ export interface I_TWEET {
   imgUrl: string;
   createdAt: number;
 }
-// 트위터 버튼 인자 타입
+// 버튼 인자 타입
 export interface I_TWEET_BTN_ARGS {
   tweetID: string;
   imgUrl: string;
@@ -22,7 +22,7 @@ const MODAL_BTN_TYPE = {
 export type MODAL_BTN_TYPE =
   (typeof MODAL_BTN_TYPE)[keyof typeof MODAL_BTN_TYPE];
 
-// 모달 Props
+// 확인-취소 모달 Props
 export interface I_MODAL_PROPS {
   title: string;
   text: string;
@@ -30,4 +30,15 @@ export interface I_MODAL_PROPS {
   btnType: MODAL_BTN_TYPE;
   setCancelState: Dispatch<SetStateAction<boolean>>;
   execFunction: () => Promise<void>;
+}
+
+// 수정폼 모달 Props
+export interface I_EDIT_MODAL_PROPS {
+  tweetID: string;
+  imgUrl: string;
+  setCancelState: Dispatch<SetStateAction<boolean>>;
+  text: string;
+}
+export interface I_TWEET_EDIT_BTN_ARGS extends I_TWEET_BTN_ARGS {
+  text: string;
 }

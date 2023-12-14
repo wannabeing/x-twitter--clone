@@ -12,11 +12,18 @@ import styled from "styled-components";
 import Loader from "../loader";
 import { deleteObject, ref } from "firebase/storage";
 import { AnimatePresence } from "framer-motion";
-import { I_MODAL_PROPS, I_TWEET, I_TWEET_BTN_ARGS } from "../../type-config";
-import Modal from "../modal";
+import {
+  I_EDIT_MODAL_PROPS,
+  I_MODAL_PROPS,
+  I_TWEET,
+  I_TWEET_BTN_ARGS,
+  I_TWEET_EDIT_BTN_ARGS,
+} from "../../type-config";
 import EditSvg from "/public/icons/edit.svg";
 import DelSvg from "/public/icons/delete.svg";
 import UserSvgComponent from "../user-svg-component";
+import Modal from "../modal";
+import EditModal from "./edit-modal";
 
 const Wrapper = styled.div`
   display: flex;
@@ -106,7 +113,10 @@ export default function TweetTimeLine() {
   const [tweets, setTweets] = useState<I_TWEET[]>([]);
   const [isFetch, setIsFetch] = useState(false);
   const [isClickDel, setIsClickDel] = useState(false);
+  const [isClickEdit, setIsClickEdit] = useState(false);
   const [modalProps, setModalProps] = useState<I_MODAL_PROPS | null>(null);
+  const [editModalProps, setEditModalProps] =
+    useState<I_EDIT_MODAL_PROPS | null>(null);
 
   // ✅ currentUser
   const { currentUser } = auth;
@@ -147,8 +157,21 @@ export default function TweetTimeLine() {
     };
   }, []);
 
+  const onClickEditBtn = (args: I_TWEET_EDIT_BTN_ARGS) => {
+    // ✅ SHOW EDIT MODAL
+    setIsClickEdit(true);
+
+    setEditModalProps({
+      tweetID: args.tweetID,
+      imgUrl: args.imgUrl,
+      setCancelState: setIsClickEdit,
+      text: args.text,
+    });
+  };
+
   // 🚀 트윗 삭제 버튼 클릭 함수
   const onClickDelBtn = (args: I_TWEET_BTN_ARGS) => {
+    // ✅ SHOW DELETE MODAL
     setIsClickDel(true);
 
     // ✅ 모달에 전달할 Props 설정
@@ -227,7 +250,16 @@ export default function TweetTimeLine() {
                 {/* 🔥 로그인유저와 작성유저가 같으면 수정 & 삭제버튼 보임 */}
                 {currentUser && currentUser?.uid === tweet.uid ? (
                   <>
-                    <MyBtn type="edit" onClick={() => {}}>
+                    <MyBtn
+                      type="edit"
+                      onClick={() => {
+                        onClickEditBtn({
+                          tweetID: tweet.id,
+                          imgUrl: tweet.imgUrl,
+                          text: tweet.text,
+                        });
+                      }}
+                    >
                       <SvgBtn src={EditSvg} />
                     </MyBtn>
                     <MyBtn
@@ -241,6 +273,12 @@ export default function TweetTimeLine() {
                     >
                       <SvgBtn src={DelSvg} />
                     </MyBtn>
+                    {/* 🔥 수정버튼 클릭 시, 모달창 띄움 */}
+                    <AnimatePresence>
+                      {isClickEdit && editModalProps ? (
+                        <EditModal {...editModalProps} />
+                      ) : null}
+                    </AnimatePresence>
                     {/* 🔥 삭제버튼 클릭 시, 모달창 띄움 */}
                     <AnimatePresence>
                       {isClickDel && modalProps ? (
